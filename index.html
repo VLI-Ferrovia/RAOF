@@ -8,26 +8,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --success: #27ae60; --bg: #f4f7f9; }
+        :root {
+            --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --success: #27ae60; --warning: #fff5f5; --bg: #f4f7f9;
+        }
         body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); margin: 0; }
-        .header { background: var(--primary); color: white; padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .header { background: var(--primary); color: white; padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; }
         .container { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
         .card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 1rem; }
         .section-title { font-size: 0.75rem; font-weight: 700; color: #95a5a6; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+        
         .selector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
+        select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; }
+
+        /* Validação visual */
         input[type="time"].empty { background-color: #fff5f5; border: 1px solid #feb2b2; }
         input[type="time"].filled { background-color: #f0fff4; border: 1px solid #9ae6b4; }
+
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; font-size: 0.85rem; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
         .td-input { border: 1px solid #ddd; padding: 8px; border-radius: 6px; width: 90%; }
+
         .btn-action { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-save { background: var(--primary); color: white; width: 100%; }
         .btn-pdf { background: var(--accent); color: white; float: right; margin-top: 10px; }
-        .proc-view { display: inline-block; margin-top: 10px; padding: 5px 10px; background: #edf2f7; border-radius: 5px; font-size: 0.8rem; cursor: pointer; color: #2d3748; border: 1px solid #cbd5e0; }
-        .hidden { display: none; }
+        
+        /* Estilo Procedimentos */
+        .proc-view { display: inline-block; margin-top: 10px; padding: 5px 10px; background: #edf2f7; border-radius: 5px; font-size: 0.8rem; cursor: pointer; text-decoration: none; color: #2d3748; border: 1px solid #cbd5e0; }
+        .proc-view:hover { background: #e2e8f0; }
+
         .config-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-        textarea { width: 100%; height: 100px; margin-top: 5px; border-radius: 5px; border: 1px solid #ddd; padding: 5px; }
+        .hidden { display: none; }
+        .file-input { font-size: 0.7rem; margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -35,7 +47,12 @@
 <header class="header">
     <div><h2>Acionamentos RAOF</h2></div>
     <div style="display:flex; gap:10px;">
-
+button class="btn-action" style="background:#27ae60; color:white; font-size: 0.8rem;" onclick="exportarConfig()">📤 Backup</button>
+button class="btn-action" style="background:#f39c12; color:white; font-size: 0.8rem;" onclick="document.getElementById('importFile').click()">📥 Restaurar</button>
+<input type="file" id="importFile" class="hidden" onchange="importarConfig(this)">
+          
+        <input type="file" id="importFile" class="hidden" onchange="importarConfig(this)">
+        button class="btn-action" onclick="toggleConfig()" style="background:rgba(255,255,255,0.2); color:white;">⚙️</button>
     </div>
 </header>
 
