@@ -24,6 +24,14 @@
         .td-input { border: 1px solid #ddd; padding: 8px; border-radius: 6px; width: 90%; }
         .btn-action { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-pdf { background: var(--accent); color: white; float: right; margin-top: 10px; }
+        .btn-procedimento { background: #3599db; color: white; }
+        .header-btn { min-width: 100px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1100; }
+        .modal-content { background: white; border-radius: 14px; max-width: 380px; width: 90%; padding: 1.5rem; box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .modal-header h3 { margin: 0; font-size: 1rem; color: #2c3e50; }
+        .modal-close { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #7f8c8d; }
+        .modal-body button { width: 100%; margin-bottom: 0.75rem; }
         .proc-view { display: inline-block; margin-top: 10px; padding: 5px 10px; background: #edf2f7; border-radius: 5px; font-size: 0.8rem; cursor: pointer; color: #2d3748; border: 1px solid #cbd5e0; }
         .hidden { display: none; }
         .config-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
@@ -35,7 +43,7 @@
 <header class="header">
     <div><h2>Acionamentos RAOF</h2></div>
     <div style="display:flex; gap:10px;">
-        
+        <button class="btn-action btn-procedimento header-btn" onclick="abrirModalProcedimento()">Procedimento</button>
     </div>
 </header>
 
@@ -76,6 +84,18 @@
 
 <div id="modalImg" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; display:none; justify-content:center; align-items:center;" onclick="this.style.display='none'">
     <img id="imgFull" src="" style="max-width:90%; max-height:90%; border:5px solid white; border-radius:10px;">
+</div>
+<div id="modalProcedimento" class="modal hidden" onclick="fecharModalProcedimento(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Escolha o procedimento:</h3>
+            <button class="modal-close" onclick="fecharModalProcedimento(event)">✕</button>
+        </div>
+        <div class="modal-body">
+            <button class="btn-action btn-procedimento" onclick="abrirPDF('Cenário Associado.pdf')">Cenário Associado</button>
+            <button class="btn-action btn-procedimento" onclick="abrirPDF('Fluxo RAOF.pdf')">Fluxo RAOF</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -142,12 +162,7 @@ function gerarTabela() {
     let areas = [...(DB.classes[cl]?.areas || []), ...(DB.zona[zn]?.areas || []), ...(DB.cenarios[ce]?.areas || [])];
     areas = [...new Set(areas)];
 
-    const containerProc = document.getElementById('links-procedimentos');
-    containerProc.innerHTML = "";
-    [cl, zn, ce].forEach(key => {
-        let item = DB.classes[key] || DB.zona[key] || DB.cenarios[key];
-        if(item?.img) containerProc.innerHTML += `<div class="proc-view" onclick="verImagem('${item.img}')">📖 Procedimento: ${key}</div>`;
-    });
+   
 
     document.getElementById("corpoTabela").innerHTML = areas.map((area, i) => {
         const salvo = OperacaoAtual[area] || { nome: "", hora: "" };
@@ -163,6 +178,25 @@ function gerarTabela() {
 function verImagem(src) {
     document.getElementById('imgFull').src = src;
     document.getElementById('modalImg').style.display = 'flex';
+}
+
+function abrirModalProcedimento() {
+    const modal = document.getElementById('modalProcedimento');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+}
+
+function fecharModalProcedimento(event) {
+    if (event) event.stopPropagation();
+    const modal = document.getElementById('modalProcedimento');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+}
+
+function abrirPDF(nomeArquivo) {
+    const url = encodeURI(nomeArquivo);
+    window.open(url, '_blank');
+    fecharModalProcedimento();
 }
 
 function renderConfig() {
