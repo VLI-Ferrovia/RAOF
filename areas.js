@@ -50,6 +50,7 @@ const AREAS_ACIONADAS = {
       "Supervisor CPIA",
       "Analista RC",
       "Analista Fundiário",
+       "Gerente de Área do CCO",
       "Gerente Geral do Corredor SE HOUVER TOMBAMENTO DE LOCO LIDER",
     ],
     "D/ Atropelamento ou Abalroamento": [
