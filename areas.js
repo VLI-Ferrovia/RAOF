@@ -129,7 +129,7 @@ const AREAS_ACIONADAS = {
     "Descarrilamento Simples de Vagões (SOS leve)": [
       "Supervisor CCE",
       "Supervisor CPIA",
-      "Gerente de Área do CCO"
+      "Gerente de Área do CCO",
       "Gerente de Área Operação",
       "Gerente de Área Via Permanente",
       "Gerente de Área Mecânica",
@@ -155,7 +155,7 @@ const AREAS_ACIONADAS = {
     "Incêndio/Explosão em ativo Ferroviário VLI": [
       "Supervisor CCE",
       "Supervisor CPIA",
-      "Gerente de Área do CCO"
+      "Gerente de Área do CCO",
       "Gerente de Área Operação",
       "Gerente de Área Via Permanente",
       "Gerente de Área Mecânica",
@@ -164,7 +164,7 @@ const AREAS_ACIONADAS = {
     "Tombamento / Adernamento": [
       "Supervisor CCE",
       "Supervisor CPIA",
-      "Gerente de Área do CCO"
+      "Gerente de Área do CCO",
       "Gerente de Área Operação",
       "Gerente de Área Via Permanente",
       "Gerente de Área Mecânica",
