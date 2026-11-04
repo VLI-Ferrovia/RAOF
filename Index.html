@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acionamentos RAOF</title>
+    <link rel="icon" type="image/png" href="faviconraof.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --success: #27ae60; --bg: #f4f7f9; }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); margin: 0; }
+        .header { background: var(--primary); color: white; padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .container { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
+        .card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 1rem; }
+        .section-title { font-size: 0.75rem; font-weight: 700; color: #95a5a6; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+        .selector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; cursor: pointer; }
+        input[type="time"].empty { background-color: #fff5f5; border: 1px solid #feb2b2; }
+        input[type="time"].filled { background-color: #f0fff4; border: 1px solid #9ae6b4; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; background: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; font-size: 0.85rem; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .td-input { border: 1px solid #ddd; padding: 8px; border-radius: 6px; width: 90%; }
+        .btn-action { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-pdf { background: var(--accent); color: white; float: right; margin-top: 10px; }
+        .btn-procedimento { background: #3599db; color: white; }
+        .header-btn { min-width: 100px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1100; }
+        .modal-content { background: white; border-radius: 14px; max-width: 380px; width: 90%; padding: 1.5rem; box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .modal-header h3 { margin: 0; font-size: 1rem; color: #2c3e50; }
+        .modal-close { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: #7f8c8d; }
+        .modal-body button { width: 100%; margin-bottom: 0.75rem; }
+        .proc-view { display: inline-block; margin-top: 10px; padding: 5px 10px; background: #edf2f7; border-radius: 5px; font-size: 0.8rem; cursor: pointer; color: #2d3748; border: 1px solid #cbd5e0; }
+        .hidden { display: none; }
+        .config-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        textarea { width: 100%; height: 100px; margin-top: 5px; border-radius: 5px; border: 1px solid #ddd; padding: 5px; }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div><h2>Acionamentos RAOF</h2></div>
+    <div style="display:flex; gap:10px;">
+        <button class="btn-action btn-procedimento header-btn" onclick="abrirModalProcedimento()">Procedimento</button>
+    </div>
+</header>
+
+<div class="container">
+    <div id="aba-operacao">
+        <div class="card">
+            <div class="selector-grid">
+                <div><span class="section-title">Classe/natureza</span><select id="selClasse" onchange="gerarTabela()"></select></div>
+                <div><span class="section-title">Zona Quente</span><select id="selZona" onchange="gerarTabela()"></select></div>
+                <div><span class="section-title"> Cenário Associado</span><select id="selCenario" onchange="gerarTabela()"></select></div>
+            </div>
+            <div id="links-procedimentos" style="margin-top:15px; display:flex; gap:10px;"></div>
+        </div>
+
+        <div class="card">
+            <div style="display:flex; justify-content: space-between; align-items:center;">
+                <span class="section-title">Lista de acionamentos</span>
+                <button onclick="limparOperacao()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.8rem;">Limpar dados</button>
+            </div>
+            <table id="tabelaPrincipal">
+                <thead><tr><th>#</th><th>Área</th><th>Responsável</th><th>Hora</th></tr></thead>
+                <tbody id="corpoTabela"></tbody>
+            </table>
+            <button class="btn-action btn-pdf" onclick="gerarPDF()">📄Gerar PDF</button>
+            <div style="clear:both"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modalProcedimento" class="modal hidden" onclick="fecharModalProcedimento(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Escolha o procedimento:</h3>
+            <button class="modal-close" onclick="fecharModalProcedimento(event)">✕</button>
+        </div>
+        <div class="modal-body">
+            <button class="btn-action btn-procedimento" onclick="abrirPDF('Cenário Associado.pdf')">Cenário Associado</button>
+            <button class="btn-action btn-procedimento" onclick="abrirPDF('Fluxo RAOF.pdf')">Fluxo RAOF</button>
+        </div>
+    </div>
+</div>
+
+<script src="areas.js"></script>
+<script>
+/**
+ * As áreas acionadas ficam no arquivo areas.js (editado direto no GitHub).
+ * Aqui só montamos a estrutura usada pela tela.
+ */
+const DB = { classes: {}, zona: {}, cenarios: {} };
+for (const tipo of Object.keys(DB)) {
+    DB[tipo]["-- Nenhum --"] = { areas: [] };
+    for (const [nome, areas] of Object.entries((typeof AREAS_ACIONADAS !== "undefined" && AREAS_ACIONADAS[tipo]) || {})) {
+        DB[tipo][nome] = { areas };
+    }
+}
+
+let OperacaoAtual = JSON.parse(localStorage.getItem("ferro_op_temp")) || {};
+
+function salvarProgresso() {
+    const dados = {};
+    document.querySelectorAll("#corpoTabela tr").forEach(tr => {
+        const area = tr.dataset.area;
+        const nome = tr.querySelector(".in-nome").value;
+        const hora = tr.querySelector(".in-hora").value;
+        dados[area] = { nome, hora };
+    });
+    OperacaoAtual = dados;
+    localStorage.setItem("ferro_op_temp", JSON.stringify(dados));
+    validarCampos();
+}
+
+function validarCampos() {
+    document.querySelectorAll(".in-hora").forEach(input => {
+        if(input.value) { input.classList.replace('empty', 'filled'); }
+        else { input.classList.add('empty'); input.classList.remove('filled'); }
+    });
+}
+
+function renderSelects() {
+    const fill = (id, tipo) => {
+        const sel = document.getElementById(id);
+        const val = sel.value;
+        sel.innerHTML = Object.keys(DB[tipo]).map(k => `<option value="${k}">${k}</option>`).join('');
+        if(DB[tipo][val]) sel.value = val;
+    };
+    fill("selClasse", "classes"); fill("selZona", "zona"); fill("selCenario", "cenarios");
+    gerarTabela();
+}
+
+function gerarTabela() {
+    const cl = document.getElementById("selClasse").value;
+    const zn = document.getElementById("selZona").value;
+    const ce = document.getElementById("selCenario").value;
+    
+    let areas = [...(DB.classes[cl]?.areas || []), ...(DB.zona[zn]?.areas || []), ...(DB.cenarios[ce]?.areas || [])];
+    areas = [...new Set(areas)];
+
+   
+
+    document.getElementById("corpoTabela").innerHTML = areas.map((area, i) => {
+        const salvo = OperacaoAtual[area] || { nome: "", hora: "" };
+        return `<tr data-area="${area}">
+            <td>${i+1}</td><td><strong>${area}</strong></td>
+            <td><input type="text" class="td-input in-nome" value="${salvo.nome}" oninput="salvarProgresso()"></td>
+            <td><input type="time" class="td-input in-hora" value="${salvo.hora}" oninput="salvarProgresso()">
+            <button onclick="this.previousElementSibling.value=new Date().toTimeString().slice(0,5); salvarProgresso()">⏱</button></td></tr>`;
+    }).join('');
+    validarCampos();
+}
+
+function abrirModalProcedimento() {
+    const modal = document.getElementById('modalProcedimento');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+}
+
+function fecharModalProcedimento(event) {
+    if (event) event.stopPropagation();
+    const modal = document.getElementById('modalProcedimento');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+}
+
+function abrirPDF(nomeArquivo) {
+    const url = encodeURI(nomeArquivo);
+    window.open(url, '_blank');
+    fecharModalProcedimento();
+}
+
+function limparOperacao() { if(confirm("Limpar preenchimento?")) { OperacaoAtual = {}; localStorage.removeItem("ferro_op_temp"); gerarTabela(); } }
+
+function gerarPDF() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.text("Relatório de Acionamento Ferroviário", 14, 15);
+    const rows = [];
+    document.querySelectorAll("#corpoTabela tr").forEach(tr => {
+        const cols = tr.querySelectorAll("td");
+        rows.push([cols[0].innerText, cols[1].innerText, cols[2].querySelector("input").value, cols[3].querySelector("input").value]);
+    });
+    doc.autoTable({ head: [['#', 'Área', 'Responsável', 'Hora']], body: rows, startY: 25 });
+    doc.save("Relatorio_Acionamento.pdf");
+}
+
+renderSelects();
+</script>
+</body>
+</html>
