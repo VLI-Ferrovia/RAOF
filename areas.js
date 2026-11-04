@@ -154,6 +154,7 @@ const AREAS_ACIONADAS = {
       "GA Operação",
       "GA Via Permanente",
       "GA Mecânica",
+      "Gerente de Área do CCO",
       "Gerente Geral do Corredor",
     ],
     "Descarrilamento de locomotiva": [
@@ -162,6 +163,7 @@ const AREAS_ACIONADAS = {
       "GA Operação",
       "GA Via Permanente",
       "GA Mecânica",
+      "Gerente de Área do CCO",
       "Gerente Geral do Corredor",
     ],
     "Incêndio/Explosão em ativo Ferroviário VLI": [
@@ -170,6 +172,7 @@ const AREAS_ACIONADAS = {
       "GA Operação",
       "GA Via Permanente",
       "GA Mecânica",
+      "Gerente de Área do CCO",
       "Gerente Geral do Corredor",
     ],
     "Tombamento / Adernamento": [
@@ -178,6 +181,7 @@ const AREAS_ACIONADAS = {
       "GA Operação",
       "GA Via Permanente",
       "GA Mecânica",
+      "Gerente de Área do CCO",
       "Gerente Geral do Corredor",
     ],
   },
