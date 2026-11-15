@@ -201,6 +201,12 @@ const AREAS_ACIONADAS = {
     "Ocorrência de qualquer natureza com vazamento de carga, no inicio da ocorrência ou por estratégia de atendimento.": [
       "Meio Ambiente (Supervisor)",
       "Analista de Seguros",
+      ],
+
+      "Ocorrências com impacto a linha do Metrô": [
+      "CCO Metrô",
+      
     ],
+    
   },
 };
